@@ -1,0 +1,25 @@
+import { Group } from 'src/group/entities/group.entity';
+import { User } from 'src/user/entities/user.entity';
+import {
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
+
+@Entity()
+export class Teacher {
+  @PrimaryColumn()
+  userId: number;
+
+  @OneToOne(() => User, u => u.teacher, {
+    onUpdate:"CASCADE",
+    onDelete:"CASCADE"
+  })
+  @JoinColumn()
+  user: User;
+
+  @OneToMany(() => Group, (group) => group.homework)
+  group:Group[];
+}
