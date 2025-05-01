@@ -31,4 +31,6 @@ export class User {
   teacher: Teacher;
   @OneToOne(() => Student, (student) => student.user)
   student: Student;
+
+
 }
