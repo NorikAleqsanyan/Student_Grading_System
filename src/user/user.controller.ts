@@ -1,10 +1,12 @@
-import { Controller, Get,  Body, Patch, Param, Delete, UseGuards, Res, HttpStatus} from '@nestjs/common';
+import { Controller, Get,  Body, Patch, Param, Delete, UseGuards, Res, HttpStatus, Req, UseInterceptors, UploadedFile} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto, UpdateUserImgDto, UpdateUserPasswordDto } from './dto/update-user.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from 'src/uploud/config';
 
 
 @Controller('user')
@@ -34,59 +36,84 @@ export class UserController {
     }
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto,@Res() res:Response) {
-    try{
-      const data = await this.userService.update(+id, updateUserDto);
-      return res.status(HttpStatus.CREATED).json(data)
-    }catch(e){
-      return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
+  @ApiOperation({ summary: 'Update user information' })
+  @Patch(':id/update')
+  async update(
+    @Req() req,
+    @Body() updateUserDto: UpdateUserDto,
+    @Res() res: Response,
+  ) {
+    try {
+      const data = await this.userService.update(req.user.id, updateUserDto);
+      return res.status(HttpStatus.CREATED).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Update user password' })
   @Patch(':id/password')
   async updatePassword(
-    @Param('id') id: string,
+    @Req() req,
     @Body() updateUserPasswordDto: UpdateUserPasswordDto,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     try {
-      const data = await this.userService.updatePassword(+id, updateUserPasswordDto);
+      const data = await this.userService.updatePassword(
+        req.user.id,
+        updateUserPasswordDto,
+      );
       return res.status(HttpStatus.OK).json(data);
     } catch (e) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
-  @Patch(':id/image')
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Update user profile image' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file', multerOptions))
+  @Patch('image')
   async updateImage(
-    @Param('id') id: string,
-    @Body() updateUserImgDto: UpdateUserImgDto,
+    @Req() req,
+    @UploadedFile() file,
     @Res() res: Response
   ) {
     try {
-      const data = await this.userService.updateImage(+id, updateUserImgDto);
+      const data = await this.userService.updateImage(req.user.id, file.filename);
       return res.status(HttpStatus.OK).json(data);
     } catch (e) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
 
+  
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Delete a user by ID' })
   @Delete(':id')
-  async remove(@Param('id') id: string,@Res() res:Response) {
-    try{
-      const data = await this.userService.remove(+id);
-      return res.status(HttpStatus.OK).json(data)
-    }catch(e){
-      return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
+  async remove(@Req() req, @Res() res: Response) {
+    try {
+      const data = await this.userService.remove(req.user.id);
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
 }

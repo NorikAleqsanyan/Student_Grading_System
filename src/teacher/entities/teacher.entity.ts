@@ -13,7 +13,7 @@ export class Teacher {
   @PrimaryColumn()
   userId: number;
 
-  @OneToOne(() => User, u => u.teacher, {
+  @OneToOne(() => User, user => user.teacher, {
     onUpdate:"CASCADE",
     onDelete:"CASCADE"
   })

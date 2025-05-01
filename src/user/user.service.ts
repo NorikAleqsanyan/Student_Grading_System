@@ -4,14 +4,16 @@ import { Student } from 'src/student/entities/student.entity';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto, UpdateUserImgDto, UpdateUserPasswordDto } from './dto/update-user.dto';
+import {
+  UpdateUserDto,
+  UpdateUserImgDto,
+  UpdateUserPasswordDto,
+} from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { promises as fs } from 'fs';
 import path from 'path';
-
-
-
+import { Role } from './role/user.enum';
 
 @Injectable()
 export class UserService {
@@ -25,9 +27,9 @@ export class UserService {
       createUserDto;
     const us = await this.userRepository.findOneBy({ email });
     if (us) {
-      return new BadRequestException('User not found with that email' );
+      return new BadRequestException('User alredy this email');
     }
-    const user = await this.userRepository.save({
+    const user = await this.userRepository.create({
       first_name,
       last_name,
       age,
@@ -36,10 +38,15 @@ export class UserService {
       phone,
       role,
     });
-    if (role == 1) {
-      await this.teacherRepository.save({ user });
-    }else if (role == 0) {
-      await this.studentRepository.save({ user });
+    if (role == Role.STUDENT) {
+      const student = await this.studentRepository.create({ userId: user.id, user });
+      await this.userRepository.update(user, { student });
+    } else if (role == Role.TEACHER) {
+      const teacher = await this.teacherRepository.create({
+        userId: user.id,
+        user,
+      });
+      await this.userRepository.update(user, { teacher });
     }
     return user;
   }
@@ -53,7 +60,7 @@ export class UserService {
   }
 
   async findOne(id: number) {
-    return await this.userRepository.findOne({  where:{id} });
+    return await this.userRepository.findOne({ where: { id } });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
@@ -63,24 +70,35 @@ export class UserService {
       throw new BadRequestException('User not found');
     }
 
-    return await this.userRepository.save(updateUserDto);
+    await this.userRepository.update(id, updateUserDto);
+
+    return { message: 'ok' };
   }
 
-  async updateImage(id: number, updateUserImgDto: UpdateUserImgDto) {
+  async updateImage(id: number, newImage: string) {
     const updatedUser = await this.userRepository.findOne({ where: { id } });
-
     if (!updatedUser) {
       throw new BadRequestException('User not found');
     }
-
-    if (updatedUser.image) {
-      const filePath = path.join(__dirname, '..', 'uploads', updatedUser.image);
-        await fs.unlink(filePath);
+    if (updatedUser.image && updatedUser.image != 'user.png') {
+      const filePath = path.join(
+        __dirname,
+        '..',
+        '..',
+        'uploads',
+        updatedUser.image,
+      );
+      console.log(__dirname, filePath);
+      fs.unlink(filePath);
     }
-    return await this.userRepository.save(updateUserImgDto);
-  }
+    await this.userRepository.update(id, { image: newImage });
 
-  async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto) {
+    return await this.userRepository.findOne({ where: { id } });
+  }
+  async updatePassword(
+    id: number,
+    updateUserPasswordDto: UpdateUserPasswordDto,
+  ) {
     const { oldPassword, password, confirmPassword } = updateUserPasswordDto;
 
     if (!oldPassword || !password || !confirmPassword) {
@@ -99,7 +117,9 @@ export class UserService {
     }
 
     if (password !== confirmPassword) {
-      throw new BadRequestException('New password and confirmation do not match!');
+      throw new BadRequestException(
+        'New password and confirmation do not match!',
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -109,8 +129,6 @@ export class UserService {
 
     return { message: 'Password updated successfully', user };
   }
-
-
 
   async remove(id: number) {
     const us = await this.userRepository.findOne({ where: { id } });

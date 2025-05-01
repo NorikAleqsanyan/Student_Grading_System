@@ -23,9 +23,8 @@ import { UserService } from 'src/user/user.service';
 export class AuthController {
   constructor(private readonly authService: AuthService,private usersService: UserService) {}
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @ApiBearerAuth('JWT-auth')
-  @Post()
+
+  @Post("registr")
   async create(@Body() createUserDto: CreateUserDto, @Res() res:Response) {
     try{
       const data = await this.usersService.create(createUserDto);

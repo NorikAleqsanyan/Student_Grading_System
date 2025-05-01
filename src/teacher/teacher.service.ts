@@ -11,16 +11,16 @@ export class TeacherService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
   async findAll() {
-    return await this.teacherRepository.find();
+    return await this.userRepository.find({ where: { role: 1 } });
   }
 
   async findOne(id: number) {
     const teacher = await this.userRepository.findOne({ where: { id } });
     if (!teacher) {
-      return new BadRequestException("Teacher not found"); 
+      return new BadRequestException('Teacher not found');
     }
-    if (teacher.role == 1) {
-      return new BadRequestException("Teacher not found");
+    if (teacher.role !== 1) {
+      return new BadRequestException('Teacher not found');
     }
     return teacher;
   }

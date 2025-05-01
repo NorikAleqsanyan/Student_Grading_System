@@ -17,8 +17,7 @@ import { GradeModule } from './grade/grade.module';
 import { Grade } from './grade/entities/grade.entity';
 import { Group } from './group/entities/group.entity';
 import { Homework } from './homework/entities/homework.entity';
-
-
+import { JoiPipeModule } from 'nestjs-joi';
 
 @Module({
   imports: [
@@ -27,9 +26,9 @@ import { Homework } from './homework/entities/homework.entity';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      database: 'das5_nest',
-      entities: [User, Teacher, Student, Course, Model,Grade,Group,Homework],
-      synchronize: true,
+      database: 'Student_Grading_System_DB',
+      entities: [User, Teacher, Student, Course, Model, Grade, Group, Homework],
+      synchronize: false,
     }),
     AuthModule,
     UserModule,
@@ -40,6 +39,7 @@ import { Homework } from './homework/entities/homework.entity';
     GroupModule,
     HomeworkModule,
     GradeModule,
+    JoiPipeModule,
   ],
   controllers: [],
   providers: [],

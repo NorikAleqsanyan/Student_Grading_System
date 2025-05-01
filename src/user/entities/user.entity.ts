@@ -1,6 +1,6 @@
 import { Student } from 'src/student/entities/student.entity';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
-import { Column, Entity,  OneToOne,  PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -16,7 +16,7 @@ export class User {
   password: string;
   @Column()
   age: number;
-  @Column({default:0})
+  @Column({ default: 0 })
   is_verify: number;
   @Column()
   email_token: string;
@@ -24,11 +24,11 @@ export class User {
   role: number;
   @Column()
   phone: string;
-  @Column({default:"user.png"})
+  @Column({ default: 'user.png' })
   image: string;
 
-  @OneToOne(() => Teacher, teach => teach.user)
-  teacher:Teacher
-  @OneToOne(() => Student, student => student.user)
-  student:Student
+  @OneToOne(() => Teacher, (teacher) => teacher.user)
+  teacher: Teacher;
+  @OneToOne(() => Student, (student) => student.user)
+  student: Student;
 }
