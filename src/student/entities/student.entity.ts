@@ -19,7 +19,7 @@ export class Student {
   @JoinColumn()
   user: User;
 
-  @ManyToOne(() => Group, (gr) => gr.student, {
+  @ManyToOne(() => Group, (gr) => gr.students, {
     onDelete:"CASCADE",
     onUpdate:"CASCADE"
   })

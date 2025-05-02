@@ -14,5 +14,5 @@ export class CreateGroupDto {
     activeModelId:number
     @ApiProperty()
     @JoiSchema(Joi.number().integer().required())
-    techrId:number
+    teacherId:number
 }

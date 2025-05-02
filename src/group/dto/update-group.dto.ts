@@ -16,5 +16,5 @@ export class UpdateGroupModelDto {
 export class UpdateGroupTeacherDto {
     @ApiProperty()
     @JoiSchema(Joi.number().integer().required())
-    teachrId:number
+    teacherId:number
 }

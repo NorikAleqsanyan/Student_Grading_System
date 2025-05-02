@@ -19,6 +19,6 @@ export class Teacher {
   })
   user: User;
 
-  @OneToMany(() => Group, (group) => group.homework)
+  @OneToMany(() => Group, (group) => group.teacher)
   group:Group[];
 }

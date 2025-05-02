@@ -1,7 +1,8 @@
 import { Homework } from "src/homework/entities/homework.entity";
 import { Model } from "src/model/entities/model.entity";
 import { Student } from "src/student/entities/student.entity";
-import { Column,  Entity,  JoinTable,  ManyToMany,  OneToMany,  PrimaryGeneratedColumn } from "typeorm";
+import { Teacher } from "src/teacher/entities/teacher.entity";
+import { Column,  Entity,  JoinTable,  ManyToMany,  ManyToOne,  OneToMany,  PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Group {
@@ -14,7 +15,7 @@ export class Group {
     @Column()
     activeModelId: number;
     @Column()
-    teachrId: number;
+    teacherId: number;
 
     @ManyToMany(() => Model, (group_model) => group_model.group)
     @JoinTable({
@@ -28,5 +29,8 @@ export class Group {
     homework:Homework[];
 
     @OneToMany(() => Student, (student) => student.group)
-    student:Student[];
+    students:Student[];
+
+    @ManyToOne(() => Teacher, (teacher) => teacher.group)
+    teacher:Teacher;
 }
