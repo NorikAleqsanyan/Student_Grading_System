@@ -8,7 +8,7 @@ export class Student {
   @PrimaryColumn()
   userId: number;
 
-  @Column()
+  @Column({nullable:true})
   groupId:number;
 
   @OneToOne(() => User, u => u.student, {

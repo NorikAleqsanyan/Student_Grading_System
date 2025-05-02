@@ -29,7 +29,7 @@ export class UserService {
     if (us) {
       return new BadRequestException('User alredy this email');
     }
-    const user = await this.userRepository.create({
+    const user = await this.userRepository.save({
       first_name,
       last_name,
       age,
@@ -38,15 +38,14 @@ export class UserService {
       phone,
       role,
     });
+    console.log(user);
+    
     if (role == Role.STUDENT) {
-      const student = await this.studentRepository.create({ userId: user.id, user });
-      await this.userRepository.update(user, { student });
+      await this.studentRepository.save({ userId: user.id });
     } else if (role == Role.TEACHER) {
-      const teacher = await this.teacherRepository.create({
+      await this.teacherRepository.save({
         userId: user.id,
-        user,
       });
-      await this.userRepository.update(user, { teacher });
     }
     return user;
   }

@@ -8,19 +8,18 @@ import { User } from 'src/user/entities/user.entity';
 export class TeacherService {
   constructor(
     @InjectRepository(Teacher) private teacherRepository: Repository<Teacher>,
-    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
   async findAll() {
-    return await this.userRepository.find({ where: { role: 1 } });
+    return await this.teacherRepository.find({ relations: ['user'] });
   }
 
   async findOne(id: number) {
-    const teacher = await this.userRepository.findOne({ where: { id } });
+    const teacher = await this.teacherRepository.findOne({
+      where: { userId: id },
+      relations: ['user'],
+    });
     if (!teacher) {
-      return new BadRequestException('Teacher not found');
-    }
-    if (teacher.role !== 1) {
-      return new BadRequestException('Teacher not found');
+      return { message: 'Teacher not found.', error: true };
     }
     return teacher;
   }
