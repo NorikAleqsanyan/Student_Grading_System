@@ -36,7 +36,7 @@ export class CourseService {
       },
     });
     if (!course) {
-      return { message: 'Cours not found.', error: true };
+      return { message: 'Course not found.', error: true };
     }
 
     return course;
@@ -46,7 +46,7 @@ export class CourseService {
     const { name } = updateCourseDto;
     const course = await this.courseRepository.findOne({ where: { id } });
     if (!course) {
-      return { message: 'Cours not found.', error: true };
+      return { message: 'Course not found.', error: true };
     }
     const extingCourse = await this.courseRepository.findOne({
       where: { name: name },
@@ -56,17 +56,17 @@ export class CourseService {
     }
     await this.courseRepository.update(id, updateCourseDto);
 
-    return { message: 'Cours update.', error: false };
+    return { message: 'Course update.', error: false };
   }
 
   async remove(id: number): Promise<object> {
     const course = await this.courseRepository.findOne({ where: { id } });
     if (!course) {
-      return { message: 'Cours not found.', error: true };
+      return { message: 'Course not found.', error: true };
     }
 
     await this.courseRepository.remove(course);
 
-    return { message: 'Cours delete.', error: false };
+    return { message: 'Course delete.', error: false };
   }
 }
