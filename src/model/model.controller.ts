@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { ModelService } from './model.service';
 import { CreateModelDto } from './dto/create-model.dto';
@@ -16,35 +27,36 @@ export class ModelController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
   @Post()
-  async create(@Body() createCourseDto: CreateModelDto, @Res() res:Response) {
-    try{
+  async create(@Body() createCourseDto: CreateModelDto, @Res() res: Response) {
+    try {
       const data = await this.modelService.create(createCourseDto);
-      return res.status(HttpStatus.CREATED).json(data)
-    }catch(e){
-      return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
+      return res.status(HttpStatus.CREATED).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
-   }
-  
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
   @Get()
-  async findAll( @Res() res:Response) {
-    try{
+  async findAll(@Res() res: Response) {
+    try {
       const data = await this.modelService.findAll();
-      return res.status(HttpStatus.OK).json(data)
-    }catch(e){
-      return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
+
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
   @Get(':id')
-  async findOne(@Param('id') id: string,@Res() res:Response) {
-    try{
-      const data = await this.modelService.findOne(+id);
-      return res.status(HttpStatus.OK).json(data)
-    }catch(e){
-      return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
+  async findOne(@Param('id') id: number, @Res() res: Response) {
+    try {
+      const data = await this.modelService.findOne(id);
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
 
@@ -52,24 +64,28 @@ export class ModelController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateModelDto: UpdateModelDto, @Res() res:Response) {
-    try{
-      const data = await this.modelService.update(+id, updateModelDto);
-      return res.status(HttpStatus.CREATED).json(data)
-    }catch(e){
-      return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
+  async update(
+    @Param('id') id: number,
+    @Body() updateModelDto: UpdateModelDto,
+    @Res() res: Response,
+  ) {
+    try {
+      const data = await this.modelService.update(id, updateModelDto);
+      return res.status(HttpStatus.CREATED).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
   @HasRoles(Role.ADMIN)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
   @Delete(':id')
-  async remove(@Param('id') id: string,@Res() res:Response) {
-    try{
-      const data = await this.modelService.remove(+id);
-      return res.status(HttpStatus.OK).json(data)
-    }catch(e){
-      return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
+  async remove(@Param('id') id: number, @Res() res: Response) {
+    try {
+      const data = await this.modelService.remove(id);
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
 }

@@ -17,21 +17,20 @@ export class ModelService {
     const { name, courseId } = createModelDto;
     const course = await this.courseRepository.findOneBy({ id: courseId });
     if (!course) {
-      throw new BadRequestException(`Course not found`);
+      return { message: 'Course not found.', error: true };
     }
-    const extingModel = await this.modelRepository.
-    createQueryBuilder("model")
-    .where('LOWER(model.name) = LOWER(:name)',{name})
-    .getOne()
+    const extingModel = await this.modelRepository.findOne({
+      where: { name: name },
+    });
     if (extingModel) {
-      return new BadRequestException( "Model name already exists" );
+      return { message: 'Model name already exists', error: true };
     }
 
     return this.modelRepository.save(createModelDto);
   }
 
   async findAll() {
-    return await this.modelRepository.find();
+    return await this.modelRepository.find({ relations: { course: true } });
   }
 
   async findOne(id: number) {
@@ -42,8 +41,9 @@ export class ModelService {
       },
     });
     if (!model) {
-      return new BadRequestException('Model not found');
+      return { message: 'Model not found.', error: true };
     }
+
     return model;
   }
 
@@ -51,24 +51,27 @@ export class ModelService {
     const { name } = updateModelDto;
     const model = await this.modelRepository.findOne({ where: { id } });
     if (!model) {
-      throw new BadRequestException('Model not found');
+      return { message: 'Model not found.', error: true };
     }
     const modelCourse = await this.modelRepository.findOneBy({
       name,
       courseId: model.courseId,
     });
     if (modelCourse) {
-      throw new BadRequestException('Course name already exists');
+      return { message: 'Course name already exists', error: true };
     }
-    return await this.modelRepository.update(id, updateModelDto);
+    await this.modelRepository.update(id, updateModelDto);
+
+    return { message: 'Model update.', error: false };
   }
 
   async remove(id: number) {
     const model = await this.modelRepository.findOne({ where: { id } });
     if (!model) {
-      return false;
+      return { message: 'Model not found.', error: true };
     }
     await this.modelRepository.remove(model);
-    return true;
+
+    return { message: 'Model delete.', error: false };
   }
 }
