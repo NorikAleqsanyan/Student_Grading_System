@@ -8,6 +8,7 @@ export class Course {
     name: string;
     @Column()
     description: string;
+    
     @OneToMany(() => Model, model => model.course)
     models: Model;
 }

@@ -4,9 +4,9 @@ import { JoiSchema } from "nestjs-joi";
 
 export class UpdateCourseDto{
     @ApiProperty()
-    @JoiSchema(Joi.string().required())
+    @JoiSchema(Joi.string())
     name: string;
     @ApiProperty()
-    @JoiSchema(Joi.string().required())
+    @JoiSchema(Joi.string())
     description:string
 }

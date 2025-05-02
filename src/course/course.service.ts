@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -11,55 +11,62 @@ export class CourseService {
     @InjectRepository(Course) private courseRepository: Repository<Course>,
   ) {}
   async create(createCourseDto: CreateCourseDto) {
-    const { name } =
-      createCourseDto;
-    const extingCourse = await this.courseRepository.
-    createQueryBuilder("course")
-    .where('LOWER(course.name) = LOWER(:name)',{name})
-    .getOne()
+    const { name } = createCourseDto;
+    const extingCourse = await this.courseRepository.findOne({
+      where: { name: name },
+    });
     if (extingCourse) {
-      return new BadRequestException( "Course name already exists" );
+      return { message: 'Course name already exists.', error: true };
     }
+
     return this.courseRepository.save(createCourseDto);
   }
 
   async findAll() {
-    return await this.courseRepository.find();
+    return await this.courseRepository.find({
+      relations: ['models'],
+    });
   }
 
   async findOne(id: number) {
-    const course = await this.courseRepository.findOne({ where: { id } , relations:{
-      models:true
-    }});
+    const course = await this.courseRepository.findOne({
+      where: { id },
+      relations: {
+        models: true,
+      },
+    });
     if (!course) {
-      return new BadRequestException("Course not found"); 
+      return { message: 'Cours not found.', error: true };
     }
+
     return course;
   }
 
   async update(id: number, updateCourseDto: UpdateCourseDto) {
-    const {name} =  updateCourseDto
+    const { name } = updateCourseDto;
     const course = await this.courseRepository.findOne({ where: { id } });
     if (!course) {
-       throw new BadRequestException("Course not found") 
+      return { message: 'Cours not found.', error: true };
     }
-    const extingCourse = await this.courseRepository.
-    createQueryBuilder("course")
-    .where('LOWER(course.name) = LOWER(:name)',{name})
-    .getOne()
+    const extingCourse = await this.courseRepository.findOne({
+      where: { name: name },
+    });
     if (extingCourse) {
-      return new BadRequestException( "Course name already exists" );
+      return { message: 'Course name already exists.', error: true };
     }
-    return await this.courseRepository.update(id, updateCourseDto);
+    await this.courseRepository.update(id, updateCourseDto);
 
+    return { message: 'Cours update.', error: false };
   }
 
-  async remove(id: number):Promise<boolean> {
+  async remove(id: number): Promise<object> {
     const course = await this.courseRepository.findOne({ where: { id } });
     if (!course) {
-      return false;
-    }  
+      return { message: 'Cours not found.', error: true };
+    }
+
     await this.courseRepository.remove(course);
-    return true
+
+    return { message: 'Cours delete.', error: false };
   }
 }
