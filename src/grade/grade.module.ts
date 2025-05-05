@@ -12,6 +12,9 @@ import { Model } from 'src/model/entities/model.entity';
 @Module({
   controllers: [GradeController],
   providers: [GradeService],
-  imports: [TypeOrmModule.forFeature([Homework,Grade,Student]),JoiPipeModule   ],
+  imports: [
+    TypeOrmModule.forFeature([Homework, Grade, Student]),
+    JoiPipeModule,
+  ],
 })
 export class GradeModule {}

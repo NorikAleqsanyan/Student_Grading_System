@@ -1,14 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Student } from 'src/student/entities/student.entity';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import {
-  UpdateUserDto,
-  UpdateUserImgDto,
-  UpdateUserPasswordDto,
-} from './dto/update-user.dto';
+import { UpdateUserDto, UpdateUserPasswordDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { promises as fs } from 'fs';
@@ -27,7 +23,7 @@ export class UserService {
       createUserDto;
     const us = await this.userRepository.findOneBy({ email });
     if (us) {
-      return new BadRequestException('User alredy this email');
+      return { message: 'User alredy this email', error: true };
     }
     const user = await this.userRepository.save({
       first_name,
@@ -38,8 +34,7 @@ export class UserService {
       phone,
       role,
     });
-    console.log(user);
-    
+
     if (role == Role.STUDENT) {
       await this.studentRepository.save({ userId: user.id });
     } else if (role == Role.TEACHER) {
@@ -47,6 +42,7 @@ export class UserService {
         userId: user.id,
       });
     }
+
     return user;
   }
 
@@ -66,7 +62,7 @@ export class UserService {
     const updatedUser = await this.userRepository.findOne({ where: { id } });
 
     if (!updatedUser) {
-      throw new BadRequestException('User not found');
+      return { message: 'User not found', error: true };
     }
 
     await this.userRepository.update(id, updateUserDto);
@@ -77,7 +73,7 @@ export class UserService {
   async updateImage(id: number, newImage: string) {
     const updatedUser = await this.userRepository.findOne({ where: { id } });
     if (!updatedUser) {
-      throw new BadRequestException('User not found');
+      return { message: 'User not found', error: true };
     }
     if (updatedUser.image && updatedUser.image != 'user.png') {
       const filePath = path.join(
@@ -101,24 +97,25 @@ export class UserService {
     const { oldPassword, password, confirmPassword } = updateUserPasswordDto;
 
     if (!oldPassword || !password || !confirmPassword) {
-      throw new BadRequestException('All password fields are required!');
+      return { message: 'All password fields are required!', error: true };
     }
 
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
-      throw new BadRequestException('User not found!');
+      return { message: 'User not found!', error: true };
     }
 
     const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isOldPasswordValid) {
-      throw new BadRequestException('Old password is incorrect!');
+      return { message: 'Old password is incorrect!', error: true };
     }
 
     if (password !== confirmPassword) {
-      throw new BadRequestException(
-        'New password and confirmation do not match!',
-      );
+      return {
+        message: 'New password and confirmation do not match!',
+        error: true,
+      };
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -132,9 +129,10 @@ export class UserService {
   async remove(id: number) {
     const us = await this.userRepository.findOne({ where: { id } });
     if (!us) {
-      return false;
+      return { message: 'User not found!', error: true };
     }
     await this.userRepository.remove(us);
-    return true;
+
+    return { message: 'User Delete', error: true };
   }
 }

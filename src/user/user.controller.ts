@@ -27,9 +27,9 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
   @Get(':id')
-  async findOne(@Param('id') id: string, @Res() res:Response) {
+  async findOne(@Param('id') id: number, @Res() res:Response) {
     try{
-      const data = await this.userService.findOne(+id);
+      const data = await this.userService.findOne(id);
       return res.status(HttpStatus.OK).json(data)
     }catch(e){
       return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})

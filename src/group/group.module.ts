@@ -11,6 +11,9 @@ import { Course } from 'src/course/entities/course.entity';
 @Module({
   controllers: [GroupController],
   providers: [GroupService],
-  imports: [TypeOrmModule.forFeature([Group,Model,Teacher,Course]),JoiPipeModule],
+  imports: [
+    TypeOrmModule.forFeature([Group, Model, Teacher, Course]),
+    JoiPipeModule,
+  ],
 })
 export class GroupModule {}

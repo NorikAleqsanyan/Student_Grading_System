@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {  Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Homework } from 'src/homework/entities/homework.entity';
 import { Student } from 'src/student/entities/student.entity';
@@ -6,8 +6,6 @@ import { Repository } from 'typeorm';
 import { CreateGradeDto } from './dto/create-grade.dto';
 import { UpdateGradeDto } from './dto/update-grade.dto';
 import { Grade } from './entities/grade.entity';
-import { Group } from 'src/group/entities/group.entity';
-import { Model } from 'src/model/entities/model.entity';
 
 @Injectable()
 export class GradeService {
@@ -21,11 +19,11 @@ export class GradeService {
     const { studentId,homeworkId } = createGradeDto;
     const student = await this.studentRepository.findOneBy({ userId: studentId });
     if (!student) {
-      return new BadRequestException(`Student not found`);
+      return { message: 'Student not found', error: true };
     }
     const homework = await this.homeworkRepository.findOneBy({ id: homeworkId });
     if (!homework) {
-      return new BadRequestException(`Homework not found`);
+      return { message: 'Homework not found', error: true };
     }
 
     return this.gradeRepository.save(createGradeDto);
@@ -52,7 +50,7 @@ export class GradeService {
   async update(id: number, updateGradeDto: UpdateGradeDto) {
     const grade = await this.gradeRepository.findOneBy({id})
     if (!grade) {
-      return new BadRequestException(`Grade not found`);
+      return { message: 'Grade not found', error: true };
     }
     return this.gradeRepository.save(updateGradeDto);
   }
@@ -60,9 +58,9 @@ export class GradeService {
   async remove(id: number) {
     const grade = await this.homeworkRepository.findOne({ where: { id } });
     if (!grade) {
-      return false;
+      return { message: 'Grade not found', error: true };
     }
     await this.homeworkRepository.remove(grade);
-    return true;
+    return { message: 'Grade delete', error: false };
   }
 }

@@ -30,9 +30,9 @@ export class HomeworkController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
   @Get(':groupId/:modelId')
-  async  getHomeworkByGroupAndModel(@Param('groupId') groupId: string,@Param('modelId') modelId: string, @Res() res:Response) {
+  async  getHomeworkByGroupAndModel(@Param('groupId') groupId: number,@Param('modelId') modelId: number, @Res() res:Response) {
     try{
-      const data = await this.homeworkService.getHomeworkByGroupAndModel(+groupId, +modelId);
+      const data = await this.homeworkService.getHomeworkByGroupAndModel(groupId, modelId);
       return res.status(HttpStatus.OK).json(data)
     }catch(e){
       return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
@@ -45,9 +45,9 @@ export class HomeworkController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
   @Delete(':id')
-  async remove(@Param('id') id: string,@Res() res:Response) {
+  async remove(@Param('id') id: number,@Res() res:Response) {
     try{
-      const data = await this.homeworkService.remove(+id);
+      const data = await this.homeworkService.remove(id);
       return res.status(HttpStatus.OK).json(data)
     }catch(e){
       return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})

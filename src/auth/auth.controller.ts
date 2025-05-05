@@ -49,9 +49,9 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
   @Get('profile')
-  getProfile(@Request() req, @Res() res:Response) {
+  async getProfile(@Request() req, @Res() res:Response) {
     try{
-      const data = req.user
+      const data = await req.user
       return res.status(HttpStatus.CREATED).json(data)
     }catch(e){
       return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
@@ -62,9 +62,9 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
   @Get('admin')
-  onlyAdmin(@Request() req, @Res() res:Response) {
+  async onlyAdmin(@Request() req, @Res() res:Response) {
     try{
-      const data = req.user
+      const data = await req.user
       return res.status(HttpStatus.CREATED).json(data)
     }catch(e){
       return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
@@ -75,9 +75,9 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
   @Get('teacher')
-  onlyTeacher(@Request() req, @Res() res:Response) {
+  async onlyTeacher(@Request() req, @Res() res:Response) {
     try{
-      const data = req.user
+      const data = await req.user
       return res.status(HttpStatus.CREATED).json(data)
     }catch(e){
       return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
@@ -88,9 +88,9 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
   @Get('student')
-  onlyStudent(@Request() req, @Res() res:Response) {
+  async onlyStudent(@Request() req, @Res() res:Response) {
     try{
-      const data = req.user
+      const data = await req.user
       return res.status(HttpStatus.CREATED).json(data)
     }catch(e){
       return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
