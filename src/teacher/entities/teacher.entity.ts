@@ -17,6 +17,7 @@ export class Teacher {
     onUpdate:"CASCADE",
     onDelete:"CASCADE"
   })
+  @JoinColumn()
   user: User;
 
   @OneToMany(() => Group, (group) => group.teacher)

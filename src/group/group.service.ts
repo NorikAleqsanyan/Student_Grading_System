@@ -51,7 +51,17 @@ export class GroupService {
   }
 
   async findAll() {
-    return await this.groupRepository.find({ relations: ['student'] });
+    return await this.groupRepository.find({
+      relations: {
+        students: {
+          user: true,
+        },
+        model: true,
+        teacher: {
+          user: true,
+        },
+      },
+    });
   }
 
   async findOne(id: number) {
@@ -60,7 +70,9 @@ export class GroupService {
       relations: {
         students: true,
         model: true,
-        teacher: true,
+        teacher: {
+          user: true,
+        },
       },
     });
     if (!group) {
@@ -104,6 +116,7 @@ export class GroupService {
 
     return { message: 'Group Model update.', error: false };
   }
+
   async updateGroupTeacher(
     id: number,
     updateGroupTeacherDto: UpdateGroupTeacherDto,
@@ -121,7 +134,7 @@ export class GroupService {
       return { message: 'Teacher not found', error: true };
     }
 
-    await this.groupRepository.update(id, { teacherId: teacherId });
+    await this.groupRepository.update(id, { teacherUserId: teacherId });
 
     return { message: 'Group Teacher update.', error: false };
   }

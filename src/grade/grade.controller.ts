@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpStatus, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  HttpStatus,
+  Res,
+} from '@nestjs/common';
 import { GradeService } from './grade.service';
 import { CreateGradeDto } from './dto/create-grade.dto';
 import { UpdateGradeDto } from './dto/update-grade.dto';
@@ -17,12 +28,12 @@ export class GradeController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
   @Post()
-  async create(@Body() createGradeDto: CreateGradeDto, @Res() res:Response) {
-    try{
+  async create(@Body() createGradeDto: CreateGradeDto, @Res() res: Response) {
+    try {
       const data = await this.gradeService.create(createGradeDto);
-      return res.status(HttpStatus.CREATED).json(data)
-    }catch(e){
-      return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
+      return res.status(HttpStatus.CREATED).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
 
@@ -30,25 +41,46 @@ export class GradeController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateGradeDto: UpdateGradeDto,@Res() res:Response) {
-    try{
+  async update(
+    @Param('id') id: string,
+    @Body() updateGradeDto: UpdateGradeDto,
+    @Res() res: Response,
+  ) {
+    try {
       const data = await this.gradeService.update(+id, updateGradeDto);
-      return res.status(HttpStatus.CREATED).json(data)
-    }catch(e){
-      return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
+      return res.status(HttpStatus.CREATED).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
-  
+
   @HasRoles(Role.TEACHER)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
   @Delete(':id')
-  async remove(@Param('id') id: string,@Res() res:Response) {
-    try{
+  async remove(@Param('id') id: string, @Res() res: Response) {
+    try {
       const data = await this.gradeService.remove(+id);
-      return res.status(HttpStatus.OK).json(data)
-    }catch(e){
-      return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
+    }
+  }
+
+  @HasRoles(Role.TEACHER)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @ApiBearerAuth('JWT-auth')
+  @Get(':groupId/:modelId')
+  async getGradedByModelId(
+    @Param('groupId') groupId: number,
+    @Param('modelId') modelId: number,
+    @Res() res: Response,
+  ) {
+    try {
+      const data = await this.gradeService.getGradedByModelId(groupId, modelId);
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
 }

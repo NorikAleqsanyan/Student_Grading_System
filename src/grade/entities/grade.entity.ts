@@ -1,6 +1,6 @@
 import { Homework } from "src/homework/entities/homework.entity";
 import { Student } from "src/student/entities/student.entity";
-import { Column, Entity, ManyToOne,  PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne,  OneToMany,  PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Grade {
@@ -13,17 +13,12 @@ export class Grade {
     @Column()
     rate: number;
     
-    @ManyToOne(() => Homework, (homework) => homework.grade, {
-        onDelete:"CASCADE",
-        onUpdate:"CASCADE"
-    })
-    homework:Homework;
+    @OneToMany(() => Homework, (homework) => homework.grade)
+    homework:Homework[];
 
     @ManyToOne(() => Student, (student) => student.grade, {
         onDelete:"CASCADE",
         onUpdate:"CASCADE"
     })
     student:Student;
-
-
 }

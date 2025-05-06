@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Student } from 'src/student/entities/student.entity';
 import { Teacher } from 'src/teacher/entities/teacher.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto, UpdateUserPasswordDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -51,11 +51,13 @@ export class UserService {
   }
 
   async findAll() {
-    return await this.userRepository.find();
+    return await this.userRepository.find({
+      where: { role: In([0, 1]) },
+    });
   }
 
   async findOne(id: number) {
-    return await this.userRepository.findOne({ where: { id } });
+    return await this.userRepository.findOne({ where: { id, role: In([0, 1]) } });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {

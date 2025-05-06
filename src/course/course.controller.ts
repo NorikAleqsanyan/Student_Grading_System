@@ -12,6 +12,7 @@ import { UpdateCourseDto } from './dto/update-course.dto';
 @Controller('course')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
+  
   @HasRoles(Role.ADMIN)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')

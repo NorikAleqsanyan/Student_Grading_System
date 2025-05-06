@@ -13,7 +13,7 @@ import { Model } from 'src/model/entities/model.entity';
   controllers: [GradeController],
   providers: [GradeService],
   imports: [
-    TypeOrmModule.forFeature([Homework, Grade, Student]),
+    TypeOrmModule.forFeature([Homework, Grade, Student, Model, Group]),
     JoiPipeModule,
   ],
 })

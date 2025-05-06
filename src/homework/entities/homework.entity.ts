@@ -29,8 +29,11 @@ export class Homework {
     })
     model: Model;
 
-    @OneToMany(() => Grade, (grade) => grade.homework)
-    grade:Grade[];
+    @ManyToOne(() => Grade, (grade) => grade.homework ,{
+        onDelete:"CASCADE",
+        onUpdate:"CASCADE"
+    })
+    grade:Grade;
 
     @ManyToOne(() => Teacher, (teacher) => teacher.group, {
         onDelete:"CASCADE",

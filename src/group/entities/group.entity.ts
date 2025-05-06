@@ -6,16 +6,21 @@ import { Column,  Entity,  JoinTable,  ManyToMany,  ManyToOne,  OneToMany,  Prim
 
 @Entity()
 export class Group {
+
     @PrimaryGeneratedColumn()
     id: number;
+
     @Column()
     name: string;
+    
     @Column()
     coursId: number;
+    
     @Column()
     activeModelId: number;
+    
     @Column()
-    teacherId: number;
+    teacherUserId: number;
 
     @ManyToMany(() => Model, (group_model) => group_model.group)
     @JoinTable({
