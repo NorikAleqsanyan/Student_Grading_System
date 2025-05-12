@@ -17,19 +17,23 @@ export class ModelService {
     const { name, courseId } = createModelDto;
     const course = await this.courseRepository.findOneBy({ id: courseId });
     if (!course) {
+      
       return { message: 'Course not found.', error: true };
     }
     const extingModel = await this.modelRepository.findOne({
       where: { name: name },
     });
     if (extingModel) {
+      
       return { message: 'Model name already exists', error: true };
     }
 
+    
     return this.modelRepository.save(createModelDto);
   }
 
   async findAll() {
+    
     return await this.modelRepository.find({ relations: { course: true } });
   }
 
@@ -41,6 +45,7 @@ export class ModelService {
       },
     });
     if (!model) {
+      
       return { message: 'Model not found.', error: true };
     }
 
@@ -58,20 +63,25 @@ export class ModelService {
       courseId: model.courseId,
     });
     if (modelCourse) {
+
       return { message: 'Course name already exists', error: true };
     }
     await this.modelRepository.update(id, updateModelDto);
 
+    
     return { message: 'Model update.', error: false };
   }
 
   async remove(id: number) {
     const model = await this.modelRepository.findOne({ where: { id } });
     if (!model) {
+
+      
       return { message: 'Model not found.', error: true };
     }
     await this.modelRepository.remove(model);
 
+    
     return { message: 'Model delete.', error: false };
   }
 }

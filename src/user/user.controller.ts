@@ -107,7 +107,7 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete a user by ID' })
-  @Delete(':id')
+  @Delete('remove')
   async remove(@Req() req, @Res() res: Response) {
     try {
       const data = await this.userService.remove(req.user.id);
