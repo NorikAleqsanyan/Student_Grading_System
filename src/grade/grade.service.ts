@@ -38,28 +38,35 @@ export class GradeService {
     return this.gradeRepository.save(createGradeDto);
   }
 
-  async getGradedByModelId(modelId: number, groupId: number) {
+  async getGradedByModelId(groupId: number, modelId: number) {
     const group = await this.groupRepository.findOneBy({ id: groupId });
     if (!group) {
-      throw new BadRequestException(`Model not found`);
+      throw new BadRequestException(`Group not found`);
     }
-    const model = await this.modelRepository.findOneBy({ id: modelId });
+
+    const model = await this.modelRepository.findOne({
+      where: { id: modelId },
+      relations: { group: true },
+    });
+
     if (!model) {
       throw new BadRequestException(`Model not found`);
     }
 
     if (model.group.id == groupId) {
-      throw new BadRequestException(`Model not found`);
+      throw new BadRequestException(`Model group not found`);
     }
-    const homeworks = await this.homeworkRepository.find({
-      where:{model,group},
-      relations:{
-        grade:{
-          student:true
-        }
-      }
-    }) 
-    return homeworks
+    const homeworks = await this.homeworkRepository
+    .createQueryBuilder('homework')
+    .leftJoinAndSelect('homework.grade', 'grade')
+    .leftJoinAndSelect('grade.student', 'student')
+    .leftJoinAndSelect('homework.model', 'model')
+    .leftJoinAndSelect('homework.group', 'group')
+    .where('model.id = :modelId', { modelId })
+    .andWhere('group.id = :groupId', { groupId })
+    .getMany();
+
+    return homeworks;
   }
 
   async update(id: number, updateGradeDto: UpdateGradeDto) {
@@ -67,7 +74,8 @@ export class GradeService {
     if (!grade) {
       return { message: 'Grade not found', error: true };
     }
-    return this.gradeRepository.save(updateGradeDto);
+    this.gradeRepository.update(id, updateGradeDto);
+    return { message: 'Grade uptade', error: false };
   }
 
   async remove(id: number) {

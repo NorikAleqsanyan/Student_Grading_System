@@ -34,31 +34,6 @@ export class HomeworkService {
     });
   }
 
-  async getHomeworkByGroupAndModel(modelId: number, groupId: number) {
-    const group = await this.groupRepository.findOneBy({ id: groupId });
-    if (!group) {
-      return { message: 'Grade not found', error: true };
-    }
-    const model = await this.modelRepository.findOneBy({ id: modelId });
-    if (!model) {
-      return { message: 'Model not found', error: true };
-    }
-
-    const modelAndGroup = await this.groupRepository
-      .createQueryBuilder('group')
-      .innerJoinAndSelect('group.model', 'group_model')
-      .where('group_model.groupId = groupId', { groupId })
-      .andWhere('group_model.modelId = modelId', { modelId })
-      .getOne();
-
-    if (modelAndGroup) {
-      return { message: 'Group and Model relation not found', error: true };
-    }
-    return await this.homeworkRepository.find({
-      where: { modelId, groupId },
-    });
-  }
-
   async remove(id: number) {
     const homework = await this.homeworkRepository.findOne({ where: { id } });
     if (!homework) {
