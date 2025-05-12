@@ -18,7 +18,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
       return user;
     } catch (error) {
-      console.error('Error validating user', error);
       return { message: 'Authentication failed', error: true };
     }
   }

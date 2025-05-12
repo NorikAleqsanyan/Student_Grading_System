@@ -1,6 +1,6 @@
 import { Controller, Get,  Body, Patch, Param, Delete, UseGuards, Res, HttpStatus, Req, UseInterceptors, UploadedFile} from '@nestjs/common';
 import { UserService } from './user.service';
-import { UpdateUserDto, UpdateUserImgDto, UpdateUserPasswordDto } from './dto/update-user.dto';
+import { UpdateUserDto,  UpdateUserPasswordDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';

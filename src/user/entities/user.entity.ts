@@ -6,24 +6,28 @@ import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
+
   @Column()
   first_name: string;
+
   @Column()
   last_name: string;
+
   @Column()
-  email: string;
+  userName: string;
+
   @Column()
   password: string;
+
   @Column()
   age: number;
-  @Column({ default: 0 })
-  is_verify: number;
-  @Column()
-  email_token: string;
+
   @Column()
   role: number;
+
   @Column()
   phone: string;
+
   @Column({ default: 'user.png' })
   image: string;
 
@@ -32,6 +36,4 @@ export class User {
  
   @OneToOne(() => Student, (student) => student.user)
   student: Student;
-
-
 }

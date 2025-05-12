@@ -19,17 +19,17 @@ export class UserService {
     @InjectRepository(Student) private studentRepository: Repository<Student>,
   ) {}
   async create(createUserDto: CreateUserDto) {
-    const { first_name, last_name, age, email, password, phone, role } =
+    const { first_name, last_name, age, userName, password, phone, role } =
       createUserDto;
-    const us = await this.userRepository.findOneBy({ email });
+    const us = await this.userRepository.findOneBy({ userName });
     if (us) {
-      return { message: 'User alredy this email', error: true };
+      return { message: 'User alredy this userName', error: true };
     }
     const user = await this.userRepository.save({
       first_name,
       last_name,
       age,
-      email,
+      userName,
       password: bcrypt.hashSync(password, 10),
       phone,
       role,
@@ -46,8 +46,8 @@ export class UserService {
     return user;
   }
 
-  async findUserByEmail(email: string) {
-    return await this.userRepository.findOneBy({ email });
+  async findUserByuserName(userName: string) {
+    return await this.userRepository.findOneBy({ userName });
   }
 
   async findAll() {
