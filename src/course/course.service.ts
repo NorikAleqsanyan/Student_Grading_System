@@ -8,65 +8,97 @@ import { Course } from './entities/course.entity';
 @Injectable()
 export class CourseService {
   constructor(
-    @InjectRepository(Course) private courseRepository: Repository<Course>,
+    @InjectRepository(Course)
+    private courseRepository: Repository<Course>,
   ) {}
-  async create(createCourseDto: CreateCourseDto) {
-    const { name } = createCourseDto;
-    const extingCourse = await this.courseRepository.findOne({
-      where: { name: name },
+
+  /**
+   * Creates a new course.
+   * @param createCourseDto - Data for creating a course.
+   * @returns The created course or an error message if the name already exists.
+   */
+  async create(createCourseDto: CreateCourseDto): Promise<Course | object> {
+    const { name, description } = createCourseDto;
+    const existingCourse = await this.courseRepository.findOne({
+      where: { name },
     });
-    if (extingCourse) {
+    if (existingCourse) {
+     
       return { message: 'Course name already exists.', error: true };
     }
 
-    return this.courseRepository.save(createCourseDto);
+    return this.courseRepository.save({ name, description });
   }
 
-  async findAll() {
+  /**
+   * Retrieves all courses along with their related models.
+   * @returns A list of all courses.
+   */
+  async findAll(): Promise<Course[]> {
     return await this.courseRepository.find({
       relations: ['models'],
     });
   }
 
-  async findOne(id: number) {
+  /**
+   * Retrieves a course by its ID with related models.
+   * @param id - The ID of the course.
+   * @returns The course or an error message if not found.
+   */
+  async findOne(id: number): Promise<Course | object> {
     const course = await this.courseRepository.findOne({
       where: { id },
-      relations: {
-        models: true,
-      },
+      relations: { models: true },
     });
     if (!course) {
+     
       return { message: 'Course not found.', error: true };
     }
 
     return course;
   }
 
-  async update(id: number, updateCourseDto: UpdateCourseDto) {
+  /**
+   * Updates a course by its ID.
+   * @param id - The ID of the course.
+   * @param updateCourseDto - The new data to update the course with.
+   * @returns A success message or an error message if not found or name already exists.
+   */
+  async update(id: number, updateCourseDto: UpdateCourseDto): Promise<object> {
     const { name } = updateCourseDto;
     const course = await this.courseRepository.findOne({ where: { id } });
     if (!course) {
+     
       return { message: 'Course not found.', error: true };
     }
-    const extingCourse = await this.courseRepository.findOne({
-      where: { name: name },
+
+    const existingCourse = await this.courseRepository.findOne({
+      where: { name },
     });
-    if (extingCourse) {
+    if (existingCourse && existingCourse.id !== id) {
+     
       return { message: 'Course name already exists.', error: true };
     }
-    await this.courseRepository.update(id, updateCourseDto);
 
-    return { message: 'Course update.', error: false };
+    await this.courseRepository.update(id, updateCourseDto);
+   
+    return { message: 'Course updated.', error: false };
   }
 
+  /**
+   * Deletes a course by its ID.
+   * @param id - The ID of the course.
+   * @returns A success message or an error message if not found.
+   */
   async remove(id: number): Promise<object> {
     const course = await this.courseRepository.findOne({ where: { id } });
     if (!course) {
+     
       return { message: 'Course not found.', error: true };
     }
 
     await this.courseRepository.remove(course);
-
-    return { message: 'Course delete.', error: false };
+   
+    return { message: 'Course deleted.', error: false };
   }
 }
