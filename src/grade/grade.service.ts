@@ -33,12 +33,13 @@ export class GradeService {
   async create(
     createGradeDto: CreateGradeDto,
   ): Promise<Grade | { message: string; error: boolean }> {
-    const { studentId, homeworkId } = createGradeDto;
+    const { studentId, homeworkId, rate } = createGradeDto;
 
     const student = await this.studentRepository.findOneBy({
       userId: studentId,
     });
     if (!student) {
+      
       return { message: 'Student not found', error: true };
     }
 
@@ -46,10 +47,11 @@ export class GradeService {
       id: homeworkId,
     });
     if (!homework) {
+      
       return { message: 'Homework not found', error: true };
     }
 
-    return this.gradeRepository.save(createGradeDto);
+    return this.gradeRepository.save({ studentId, homeworkId, rate });
   }
 
   /**
@@ -65,6 +67,7 @@ export class GradeService {
   ): Promise<Homework[] | { message: string; error: boolean }> {
     const group = await this.groupRepository.findOneBy({ id: groupId });
     if (!group) {
+      
       return { message: `Group not found`, error: true };
     }
 
@@ -74,10 +77,12 @@ export class GradeService {
     });
 
     if (!model) {
+      
       return { message: `Model not found`, error: true };
     }
 
     if (model.group.id == groupId) {
+      
       return { message: `Model group not found`, error: true };
     }
 
@@ -108,10 +113,12 @@ export class GradeService {
   ): Promise<{ message: string; error: boolean }> {
     const grade = await this.gradeRepository.findOneBy({ id });
     if (!grade) {
+      
       return { message: 'Grade not found', error: true };
     }
 
     await this.gradeRepository.update(id, updateGradeDto);
+    
     return { message: 'Grade update', error: false };
   }
 
@@ -125,10 +132,12 @@ export class GradeService {
   async remove(id: number): Promise<{ message: string; error: boolean }> {
     const grade = await this.homeworkRepository.findOne({ where: { id } });
     if (!grade) {
+      
       return { message: 'Grade not found', error: true };
     }
 
     await this.homeworkRepository.remove(grade);
+    
     return { message: 'Grade deleted', error: false };
   }
 }
