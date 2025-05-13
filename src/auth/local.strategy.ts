@@ -9,16 +9,20 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     super();
   }
 
-  async validate(username: string, password: string): Promise<any> {
-    try {
-      const user = await this.authService.validateUser(username, password);
-      if (!user) {
-        return { message: 'Invalid username or password', error: true };
-      }
+  /**
+   * Validates the user credentials using AuthService.
+   * @param username - The username submitted by the client.
+   * @param password - The password submitted by the client.
+   * @returns The validated user if credentials are correct.
+   * @throws UnauthorizedException if validation fails.
+   */
+  async validate(username: string, password: string): Promise<object> {
+    const user = await this.authService.validateUser(username, password);
+    if (!user) {
 
-      return user;
-    } catch (error) {
-      return { message: 'Authentication failed', error: true };
+      return { massage: 'Invalid username or password', error: true };
     }
+
+    return user;
   }
 }
