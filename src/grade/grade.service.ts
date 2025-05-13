@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from 'src/group/entities/group.entity';
 import { Homework } from 'src/homework/entities/homework.entity';
@@ -9,6 +9,9 @@ import { CreateGradeDto } from './dto/create-grade.dto';
 import { UpdateGradeDto } from './dto/update-grade.dto';
 import { Grade } from './entities/grade.entity';
 
+/**
+ * Service for managing grades.
+ */
 @Injectable()
 export class GradeService {
   constructor(
@@ -20,14 +23,25 @@ export class GradeService {
     @InjectRepository(Group) private groupRepository: Repository<Group>,
   ) {}
 
-  async create(createGradeDto: CreateGradeDto) {
+  /**
+   * Creates a new grade for a student on a homework assignment.
+   *
+   * @param {CreateGradeDto} createGradeDto - The data for creating the grade.
+   * @returns {Promise<Grade | { message: string, error: boolean }>}
+   * - Returns the created grade if successful, or an error message if student or homework is not found.
+   */
+  async create(
+    createGradeDto: CreateGradeDto,
+  ): Promise<Grade | { message: string; error: boolean }> {
     const { studentId, homeworkId } = createGradeDto;
+
     const student = await this.studentRepository.findOneBy({
       userId: studentId,
     });
     if (!student) {
       return { message: 'Student not found', error: true };
     }
+
     const homework = await this.homeworkRepository.findOneBy({
       id: homeworkId,
     });
@@ -38,10 +52,20 @@ export class GradeService {
     return this.gradeRepository.save(createGradeDto);
   }
 
-  async getGradedByModelId(groupId: number, modelId: number) {
+  /**
+   * Retrieves all graded homeworks for a given group and model.
+   *
+   * @param {number} groupId - The ID of the group.
+   * @param {number} modelId - The ID of the model.
+   * @returns {Promise<Homework[]>} - Returns the list of graded homeworks for the specified group and model.
+   */
+  async getGradedByModelId(
+    groupId: number,
+    modelId: number,
+  ): Promise<Homework[] | { message: string; error: boolean }> {
     const group = await this.groupRepository.findOneBy({ id: groupId });
     if (!group) {
-      throw new BadRequestException(`Group not found`);
+      return { message: `Group not found`, error: true };
     }
 
     const model = await this.modelRepository.findOne({
@@ -50,40 +74,61 @@ export class GradeService {
     });
 
     if (!model) {
-      throw new BadRequestException(`Model not found`);
+      return { message: `Model not found`, error: true };
     }
 
     if (model.group.id == groupId) {
-      throw new BadRequestException(`Model group not found`);
+      return { message: `Model group not found`, error: true };
     }
+
     const homeworks = await this.homeworkRepository
-    .createQueryBuilder('homework')
-    .leftJoinAndSelect('homework.grade', 'grade')
-    .leftJoinAndSelect('grade.student', 'student')
-    .leftJoinAndSelect('homework.model', 'model')
-    .leftJoinAndSelect('homework.group', 'group')
-    .where('model.id = :modelId', { modelId })
-    .andWhere('group.id = :groupId', { groupId })
-    .getMany();
+      .createQueryBuilder('homework')
+      .leftJoinAndSelect('homework.grade', 'grade')
+      .leftJoinAndSelect('grade.student', 'student')
+      .leftJoinAndSelect('homework.model', 'model')
+      .leftJoinAndSelect('homework.group', 'group')
+      .where('model.id = :modelId', { modelId })
+      .andWhere('group.id = :groupId', { groupId })
+      .getMany();
 
     return homeworks;
   }
 
-  async update(id: number, updateGradeDto: UpdateGradeDto) {
+  /**
+   * Updates the grade of a homework assignment.
+   *
+   * @param {number} id - The ID of the grade to update.
+   * @param {UpdateGradeDto} updateGradeDto - The data to update the grade with.
+   * @returns {Promise<{ message: string, error: boolean }>}
+   * - Returns a success message if updated, or an error message if the grade is not found.
+   */
+  async update(
+    id: number,
+    updateGradeDto: UpdateGradeDto,
+  ): Promise<{ message: string; error: boolean }> {
     const grade = await this.gradeRepository.findOneBy({ id });
     if (!grade) {
       return { message: 'Grade not found', error: true };
     }
-    this.gradeRepository.update(id, updateGradeDto);
-    return { message: 'Grade uptade', error: false };
+
+    await this.gradeRepository.update(id, updateGradeDto);
+    return { message: 'Grade update', error: false };
   }
 
-  async remove(id: number) {
+  /**
+   * Deletes a grade by its ID.
+   *
+   * @param {number} id - The ID of the grade to delete.
+   * @returns {Promise<{ message: string, error: boolean }>}
+   * - Returns a success message if deleted, or an error message if grade is not found.
+   */
+  async remove(id: number): Promise<{ message: string; error: boolean }> {
     const grade = await this.homeworkRepository.findOne({ where: { id } });
     if (!grade) {
       return { message: 'Grade not found', error: true };
     }
+
     await this.homeworkRepository.remove(grade);
-    return { message: 'Grade delete', error: false };
+    return { message: 'Grade deleted', error: false };
   }
 }
