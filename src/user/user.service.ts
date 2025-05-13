@@ -18,13 +18,21 @@ export class UserService {
     @InjectRepository(Teacher) private teacherRepository: Repository<Teacher>,
     @InjectRepository(Student) private studentRepository: Repository<Student>,
   ) {}
+
+  /**
+   * Creates a new user and links them to a Student or Teacher entity based on role.
+   * @param createUserDto - User creation data
+   * @returns The created user or an error message if the username already exists
+   */
   async create(createUserDto: CreateUserDto) {
     const { first_name, last_name, age, userName, password, phone, role } =
       createUserDto;
     const us = await this.userRepository.findOneBy({ userName });
     if (us) {
-      return { message: 'User alredy this userName', error: true };
+
+      return { message: 'User already exists with this userName', error: true };
     }
+
     const user = await this.userRepository.save({
       first_name,
       last_name,
@@ -38,32 +46,54 @@ export class UserService {
     if (role == Role.STUDENT) {
       await this.studentRepository.save({ userId: user.id });
     } else if (role == Role.TEACHER) {
-      await this.teacherRepository.save({
-        userId: user.id,
-      });
+      await this.teacherRepository.save({ userId: user.id });
     }
 
     return user;
   }
 
+  /**
+   * Finds a user by their username.
+   * @param userName - Username to search
+   * @returns The user if found
+   */
   async findUserByuserName(userName: string) {
+
     return await this.userRepository.findOneBy({ userName });
   }
 
+  /**
+   * Retrieves all users with roles STUDENT or TEACHER.
+   * @returns Array of users
+   */
   async findAll() {
+
     return await this.userRepository.find({
       where: { role: In([0, 1]) },
     });
   }
 
+  /**
+   * Finds one user by ID if they are a student or teacher.
+   * @param id - User ID
+   * @returns The user if found
+   */
   async findOne(id: number) {
+
     return await this.userRepository.findOne({ where: { id, role: In([0, 1]) } });
   }
 
+  /**
+   * Updates user data.
+   * @param id - User ID
+   * @param updateUserDto - Updated user information
+   * @returns Success message or error if user is not found
+   */
   async update(id: number, updateUserDto: UpdateUserDto) {
     const updatedUser = await this.userRepository.findOne({ where: { id } });
 
     if (!updatedUser) {
+
       return { message: 'User not found', error: true };
     }
 
@@ -72,48 +102,56 @@ export class UserService {
     return { message: 'ok' };
   }
 
+  /**
+   * Updates the user's profile image and deletes the old one if it's not the default.
+   * @param id - User ID
+   * @param newImage - New image filename
+   * @returns Updated user or error if not found
+   */
   async updateImage(id: number, newImage: string) {
     const updatedUser = await this.userRepository.findOne({ where: { id } });
     if (!updatedUser) {
+
       return { message: 'User not found', error: true };
     }
-    if (updatedUser.image && updatedUser.image != 'user.png') {
-      const filePath = path.join(
-        __dirname,
-        '..',
-        '..',
-        'uploads',
-        updatedUser.image,
-      );
-      console.log(__dirname, filePath);
+    if (updatedUser.image && updatedUser.image !== 'user.png') {
+      const filePath = path.join(__dirname, '..', '..', 'uploads', updatedUser.image);
       fs.unlink(filePath);
     }
     await this.userRepository.update(id, { image: newImage });
 
     return await this.userRepository.findOne({ where: { id } });
   }
-  async updatePassword(
-    id: number,
-    updateUserPasswordDto: UpdateUserPasswordDto,
-  ) {
+
+  /**
+   * Updates the user's password after validating the old password and matching confirmation.
+   * @param id - User ID
+   * @param updateUserPasswordDto - Password update data
+   * @returns Success or error message
+   */
+  async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto) {
     const { oldPassword, password, confirmPassword } = updateUserPasswordDto;
 
     if (!oldPassword || !password || !confirmPassword) {
+
       return { message: 'All password fields are required!', error: true };
     }
 
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
+
       return { message: 'User not found!', error: true };
     }
 
     const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isOldPasswordValid) {
+
       return { message: 'Old password is incorrect!', error: true };
     }
 
     if (password !== confirmPassword) {
+
       return {
         message: 'New password and confirmation do not match!',
         error: true,
@@ -128,13 +166,19 @@ export class UserService {
     return { message: 'Password updated successfully', user };
   }
 
+  /**
+   * Removes a user by ID.
+   * @param id - User ID
+   * @returns Success or error message
+   */
   async remove(id: number) {
     const us = await this.userRepository.findOne({ where: { id } });
     if (!us) {
+      
       return { message: 'User not found!', error: true };
     }
     await this.userRepository.remove(us);
 
-    return { message: 'User Delete', error: true };
+    return { message: 'User deleted', error: true };
   }
 }
