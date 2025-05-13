@@ -18,19 +18,22 @@ import { HasRoles } from 'src/auth/has-roles.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from 'src/user/role/user.enum';
 import { RolesGuard } from 'src/auth/roles.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('model')
 export class ModelController {
   constructor(private readonly modelService: ModelService) {}
 
-  @HasRoles(Role.ADMIN)
+  @HasRoles(Role.ADMIN,Role.TEACHER)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Create a new model' })
+  @ApiResponse({ status: 201, description: 'Model created successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
   @Post()
-  async create(@Body() createCourseDto: CreateModelDto, @Res() res: Response) {
+  async create(@Body() createModelDto: CreateModelDto, @Res() res: Response) {
     try {
-      const data = await this.modelService.create(createCourseDto);
+      const data = await this.modelService.create(createModelDto);
       return res.status(HttpStatus.CREATED).json(data);
     } catch (e) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
@@ -39,6 +42,9 @@ export class ModelController {
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get all models' })
+  @ApiResponse({ status: 200, description: 'Models retrieved successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
   @Get()
   async findAll(@Res() res: Response) {
     try {
@@ -51,6 +57,9 @@ export class ModelController {
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get a model by ID' })
+  @ApiResponse({ status: 200, description: 'Model retrieved successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
   @Get(':id')
   async findOne(@Param('id') id: number, @Res() res: Response) {
     try {
@@ -61,9 +70,12 @@ export class ModelController {
     }
   }
 
-  @HasRoles(Role.ADMIN)
+  @HasRoles(Role.ADMIN,Role.TEACHER)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Update a model' })
+  @ApiResponse({ status: 200, description: 'Model updated successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
   @Patch(':id')
   async update(
     @Param('id') id: number,
@@ -72,14 +84,18 @@ export class ModelController {
   ) {
     try {
       const data = await this.modelService.update(id, updateModelDto);
-      return res.status(HttpStatus.CREATED).json(data);
+      return res.status(HttpStatus.OK).json(data);
     } catch (e) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
-  @HasRoles(Role.ADMIN)
+
+  @HasRoles(Role.ADMIN,Role.TEACHER)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Delete a model' })
+  @ApiResponse({ status: 200, description: 'Model deleted successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
   @Delete(':id')
   async remove(@Param('id') id: number, @Res() res: Response) {
     try {
