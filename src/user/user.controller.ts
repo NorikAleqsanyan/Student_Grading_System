@@ -1,7 +1,7 @@
 import { Controller, Get,  Body, Patch, Param, Delete, UseGuards, Res, HttpStatus, Req, UseInterceptors, UploadedFile} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto,  UpdateUserPasswordDto } from './dto/update-user.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -12,27 +12,36 @@ import { multerOptions } from 'src/uploud/config';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
   @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth('JWT-auth')
   @Get()
-  async findAll(@Res() res:Response) {
-    try{
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  async findAll(@Res() res: Response) {
+    try {
       const data = await this.userService.findAll();
-      return res.status(HttpStatus.OK).json(data)
-    }catch(e){
-      return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
+      
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth('JWT-auth')
   @Get(':id')
-  async findOne(@Param('id') id: number, @Res() res:Response) {
-    try{
+  @ApiOperation({ summary: 'Get a user by ID' })
+  @ApiResponse({ status: 200, description: 'User retrieved successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  async findOne(@Param('id') id: number, @Res() res: Response) {
+    try {
       const data = await this.userService.findOne(id);
-      return res.status(HttpStatus.OK).json(data)
-    }catch(e){
-      return res.status(HttpStatus.BAD_REQUEST).json({message:e.message})
+      
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
 
@@ -47,8 +56,10 @@ export class UserController {
   ) {
     try {
       const data = await this.userService.update(req.user.id, updateUserDto);
+      
       return res.status(HttpStatus.CREATED).json(data);
     } catch (e) {
+      
       return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
@@ -67,8 +78,10 @@ export class UserController {
         req.user.id,
         updateUserPasswordDto,
       );
+      
       return res.status(HttpStatus.OK).json(data);
     } catch (e) {
+      
       return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
@@ -97,8 +110,10 @@ export class UserController {
   ) {
     try {
       const data = await this.userService.updateImage(req.user.id, file.filename);
+      
       return res.status(HttpStatus.OK).json(data);
     } catch (e) {
+      
       return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
@@ -111,8 +126,10 @@ export class UserController {
   async remove(@Req() req, @Res() res: Response) {
     try {
       const data = await this.userService.remove(req.user.id);
+      
       return res.status(HttpStatus.OK).json(data);
     } catch (e) {
+      
       return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
     }
   }
