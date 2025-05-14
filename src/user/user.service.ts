@@ -7,7 +7,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto, UpdateUserPasswordDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
-import { promises as fs } from 'fs';
+import { promises as fs, promises } from 'fs';
 import path from 'path';
 import { Role } from './role/user.enum';
 
@@ -24,7 +24,7 @@ export class UserService {
    * @param createUserDto - User creation data
    * @returns The created user or an error message if the username already exists
    */
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto):Promise<object> {
     const { first_name, last_name, age, userName, password, phone, role } =
       createUserDto;
     const us = await this.userRepository.findOneBy({ userName });
@@ -57,16 +57,16 @@ export class UserService {
    * @param userName - Username to search
    * @returns The user if found
    */
-  async findUserByuserName(userName: string) {
+  async findUserByuserName(userName: string):Promise<object | null> {
 
-    return await this.userRepository.findOneBy({ userName });
+   return await this.userRepository.findOneBy({ userName });
   }
 
   /**
    * Retrieves all users with roles STUDENT or TEACHER.
    * @returns Array of users
    */
-  async findAll() {
+  async findAll():Promise<object | null> {
 
     return await this.userRepository.find({
       where: { role: In([0, 1]) },
@@ -78,7 +78,7 @@ export class UserService {
    * @param id - User ID
    * @returns The user if found
    */
-  async findOne(id: number) {
+  async findOne(id: number):Promise<object | null> {
 
     return await this.userRepository.findOne({ where: { id, role: In([0, 1]) } });
   }
@@ -89,7 +89,7 @@ export class UserService {
    * @param updateUserDto - Updated user information
    * @returns Success message or error if user is not found
    */
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto):Promise<object> {
     const updatedUser = await this.userRepository.findOne({ where: { id } });
 
     if (!updatedUser) {
@@ -108,7 +108,7 @@ export class UserService {
    * @param newImage - New image filename
    * @returns Updated user or error if not found
    */
-  async updateImage(id: number, newImage: string) {
+  async updateImage(id: number, newImage: string):Promise<object | null> {
     const updatedUser = await this.userRepository.findOne({ where: { id } });
     if (!updatedUser) {
 
@@ -129,7 +129,7 @@ export class UserService {
    * @param updateUserPasswordDto - Password update data
    * @returns Success or error message
    */
-  async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto) {
+  async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto):Promise<object> {
     const { oldPassword, password, confirmPassword } = updateUserPasswordDto;
 
     if (!oldPassword || !password || !confirmPassword) {
@@ -171,7 +171,7 @@ export class UserService {
    * @param id - User ID
    * @returns Success or error message
    */
-  async remove(id: number) {
+  async remove(id: number):Promise<object> {
     const us = await this.userRepository.findOne({ where: { id } });
     if (!us) {
       
