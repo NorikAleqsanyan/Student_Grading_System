@@ -17,7 +17,7 @@ export const multerConfig = {
  * @param file - The incoming file object from Multer
  * @returns A new unique filename with original extension
  */
-function uuidRandom(file) {
+function uuidRandom(file: { originalname: string; }) {
   const result = `${uuid()}${extname(file.originalname)}`;
   return result;
 }
