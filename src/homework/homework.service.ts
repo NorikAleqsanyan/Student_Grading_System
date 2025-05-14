@@ -26,7 +26,7 @@ export class HomeworkService {
    * - Returns the created homework object if successful.
    * - Returns an error message if the group or model is not found or if the model is not active in the group.
    */
-  async create(createHomeworkDto: CreateHomeworkDto) {
+  async create(createHomeworkDto: CreateHomeworkDto): Promise<object | null>  {
     const { modelId, groupId, title, body } = createHomeworkDto;
     
     const group = await this.groupRepository.findOneBy({ id: groupId });
@@ -63,7 +63,7 @@ export class HomeworkService {
    * - Returns a success message if the homework is successfully deleted.
    * - Returns an error message if the homework is not found.
    */
-  async remove(id: number) {
+  async remove(id: number): Promise<object | null>  {
     const homework = await this.homeworkRepository.findOne({ where: { id } });
     if (!homework) {
 
