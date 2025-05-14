@@ -19,7 +19,7 @@ export class ModelService {
    * @param createModelDto - Data to create the model
    * @returns The saved model or an error object
    */
-  async create(createModelDto: CreateModelDto) {
+  async create(createModelDto: CreateModelDto): Promise<object | null>  {
     const { name, courseId } = createModelDto;
     const course = await this.courseRepository.findOneBy({ id: courseId });
 
@@ -45,7 +45,7 @@ export class ModelService {
    *
    * @returns Array of models
    */
-  async findAll() {
+  async findAll(): Promise<object | null>  {
 
     return await this.modelRepository.find({ relations: { course: true } });
   }
@@ -56,7 +56,7 @@ export class ModelService {
    * @param id - Model ID
    * @returns The model or an error object if not found
    */
-  async findOne(id: number) {
+  async findOne(id: number): Promise<object | null>  {
     const model = await this.modelRepository.findOne({
       where: { id },
       relations: { course: true },
@@ -77,7 +77,7 @@ export class ModelService {
    * @param updateModelDto - Data to update
    * @returns Success or error message
    */
-  async update(id: number, updateModelDto: UpdateModelDto) {
+  async update(id: number, updateModelDto: UpdateModelDto): Promise<object | null>  {
     const { name } = updateModelDto;
     const model = await this.modelRepository.findOne({ where: { id } });
 
@@ -107,7 +107,7 @@ export class ModelService {
    * @param id - Model ID
    * @returns Success or error message
    */
-  async remove(id: number) {
+  async remove(id: number): Promise<object | null>  {
     const model = await this.modelRepository.findOne({ where: { id } });
 
     if (!model) {
