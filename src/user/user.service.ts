@@ -7,7 +7,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto, UpdateUserPasswordDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
-import { promises as fs, promises } from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
 import { Role } from './role/user.enum';
 
@@ -57,7 +57,7 @@ export class UserService {
    * @param userName - Username to search
    * @returns The user if found
    */
-  async findUserByuserName(userName: string):Promise<object | null> {
+  async findUserByuserName(userName: string):Promise<any> {
 
    return await this.userRepository.findOneBy({ userName });
   }
@@ -129,7 +129,7 @@ export class UserService {
    * @param updateUserPasswordDto - Password update data
    * @returns Success or error message
    */
-  async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto):Promise<object> {
+  async updatePassword(id: number, updateUserPasswordDto: UpdateUserPasswordDto):Promise<object | null> {
     const { oldPassword, password, confirmPassword } = updateUserPasswordDto;
 
     if (!oldPassword || !password || !confirmPassword) {
