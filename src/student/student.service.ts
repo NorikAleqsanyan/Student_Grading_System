@@ -14,7 +14,7 @@ export class StudentService {
    * 
    * @returns Array of student entities with user data
    */
-  async findAll() {
+  async findAll(): Promise<object | null>  {
 
     return await this.studentRepository.find({
       relations: ['user'],
@@ -27,7 +27,7 @@ export class StudentService {
    * @param id - The user ID to search by
    * @returns The student entity or an error message if not found
    */
-  async findOne(id: number) {
+  async findOne(id: number): Promise<object | null>  {
     const student = await this.studentRepository.findOne({
       where: { userId: id },
       relations: ['user'],
