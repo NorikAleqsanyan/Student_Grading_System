@@ -26,7 +26,7 @@ import { JoiPipeModule } from 'nestjs-joi';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      database: 'student_grading_system_db',
+      database: process.env.DB_NAME,
       entities: [User, Teacher, Student, Course, Model, Grade, Group, Homework],
       synchronize: true,
     }),
